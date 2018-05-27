@@ -1,0 +1,33 @@
+---
+title: "Quiz 2"
+output: github_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## GitHub Documents
+
+
+
+```{r question1}
+library(AppliedPredictiveModeling)
+library(kernlab)
+library(ISLR)
+data(AlzheimerDisease)
+
+
+adData = data.frame(predictors)
+trainIndex = createDataPartition(diagnosis,p=0.5,list=FALSE)
+training = adData[trainIndex,]
+testing = adData[-trainIndex,]
+```
+
+
+
+```{r pressure, echo=FALSE}
+plot(pressure)
+```
+
+Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.
