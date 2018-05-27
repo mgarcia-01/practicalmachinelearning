@@ -14,7 +14,7 @@ knitr::opts_chunk$set(echo = TRUE)
 ```{r question1}
 library(AppliedPredictiveModeling)
 library(kernlab)
-library(ISLR)
+library(ISL)
 data(AlzheimerDisease)
 
 
