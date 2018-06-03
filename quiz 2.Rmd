@@ -14,20 +14,132 @@ knitr::opts_chunk$set(echo = TRUE)
 ```{r question1}
 library(AppliedPredictiveModeling)
 library(kernlab)
-library(ISL)
+library(caret)
 data(AlzheimerDisease)
 
 
-adData = data.frame(predictors)
-trainIndex = createDataPartition(diagnosis,p=0.5,list=FALSE)
-training = adData[trainIndex,]
-testing = adData[-trainIndex,]
+adData = data.frame(diagnosis,predictors)
+train = createDataPartition(diagnosis, p = 0.50,list=FALSE)
+test = createDataPartition(diagnosis, p = 0.50,list=FALSE)
+
 ```
 
 
 
-```{r pressure, echo=FALSE}
-plot(pressure)
+```{r question2, echo=TRUE}
+library(AppliedPredictiveModeling)
+data(concrete)
+library(caret)
+library(Hmisc)
+set.seed(1000)
+inTrain = createDataPartition(mixtures$CompressiveStrength, p = 3/4)[[1]]
+training = mixtures[ inTrain,]
+testing = mixtures[-inTrain,]
+
+index <- seq_along(1:nrow(training))
+
+# Number of cut groups
+nbGroups <- 10
+
+# colour by FlyAsh
+FlyAshCut <- cut2(training$FlyAsh,g=nbGroups)
+ggplot(data=training,aes(x=index,y=CompressiveStrength,color=FlyAshCut))+ geom_point()
+
+# colour by Age
+AgeCut <- cut2(training$Age,g=nbGroups)
+ggplot(data=training,aes(x=index,y=CompressiveStrength,color=AgeCut))+ geom_point()
+
+# colour by Cement
+CementCut <- cut2(training$Age,g=nbGroups)
+ggplot(data=training,aes(x=index,y=CompressiveStrength,color=CementCut))+ geom_point()
+
+# colour by Water
+WaterCut <- cut2(training$Age,g=nbGroups)
+ggplot(data=training,aes(x=index,y=CompressiveStrength,color=WaterCut))+ geom_point()
+
+# colour by BlastFurnaceSlag
+BlastFurnaceSlagCut <- cut2(training$Age,g=nbGroups)
+ggplot(data=training,aes(x=index,y=CompressiveStrength,color=BlastFurnaceSlagCut))+ geom_point()
+
+# colour by CoarseAggregate
+CoarseAggregateCut <- cut2(training$Age,g=nbGroups)
+ggplot(data=training,aes(x=index,y=CompressiveStrength,color=CoarseAggregateCut))+ geom_point()
+
+# colour by FineAggregate
+FineAggregateCut <- cut2(training$Age,g=nbGroups)
+ggplot(data=training,aes(x=index,y=CompressiveStrength,color=FineAggregateCut))+ geom_point()
+
+# colour by FineAggregate
+FineAggregateCut <- cut2(training$Age,g=nbGroups)
+ggplot(data=training,aes(x=index,y=CompressiveStrength,color=FineAggregateCut))+ geom_point()
 ```
 
-Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.
+```{r question3, echo=TRUE}
+library(AppliedPredictiveModeling)
+data(concrete)
+library(caret)
+set.seed(1000)
+inTrain = createDataPartition(mixtures$CompressiveStrength, p = 3/4)[[1]]
+training = mixtures[ inTrain,]
+testing = mixtures[-inTrain,]
+
+hist(training$Superplasticizer, breaks=20)
+hist(log(training$Superplasticizer+1), breaks=20)
+```
+```{r question4, echo=TRUE}
+library(caret)
+library(AppliedPredictiveModeling)
+set.seed(3433)
+data(AlzheimerDisease)
+adData = data.frame(diagnosis,predictors)
+inTrain = createDataPartition(adData$diagnosis, p = 3/4)[[1]]
+training = adData[ inTrain,]
+testing = adData[-inTrain,]
+
+
+IL_Colnames = grep("^IL", colnames(training), value=TRUE,ignore.case=TRUE)
+pcaMod <- preProcess(training[,IL_Colnames], method="pca", thresh=0.8)
+pcaMod
+```
+
+
+
+
+```{r question4, echo=TRUE}
+library(caret)
+library(AppliedPredictiveModeling)
+set.seed(3433)
+data(AlzheimerDisease)
+adData = data.frame(diagnosis,predictors)
+inTrain = createDataPartition(adData$diagnosis, p = 3/4)[[1]]
+training = adData[ inTrain,]
+testing = adData[-inTrain,]
+
+
+
+createSet <- function(ds){
+  IL_Colnames = grep("^IL", colnames(ds), value=TRUE,ignore.case=TRUE)
+  ds[,IL_Colnames]
+}
+
+trainingIL <- createSet(training)
+testingIL <- createSet(testing)
+
+model_no_pca <- train(training$diagnosis ~ ., trainingIL, method="glm")
+predictIL_no_pca <- predict(model_no_pca,testingIL)
+result_no_pca <- confusionMatrix(testing$diagnosis, predictIL_no_pca)
+
+result_no_pca$overall["Accuracy"]
+
+
+
+pcaObj <- preProcess(trainingIL, method="pca", thresh=0.8)
+trainingIL_pca <- predict(pcaObj, trainingIL)
+testingIL_pca <- predict(pcaObj, testingIL)
+
+model_pca <- train(training$diagnosis ~ ., trainingIL_pca, method="glm")
+predictIL_pca <- predict(model_pca,testingIL_pca)
+result_pca <- confusionMatrix(testing$diagnosis, predictIL_pca)
+
+result_pca$overall["Accuracy"]
+```
